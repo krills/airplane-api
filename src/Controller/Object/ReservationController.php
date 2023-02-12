@@ -17,7 +17,7 @@ class ReservationController extends AbstractController
 
     private static function getRandomSeat(): string
     {
-        return ['A','B','C','D','E','F'][random_int(0, 5)] . random_int(1, 40);
+        return ['A','B','C','D','E','F'][random_int(0, 5)] . random_int(1, 32);
     }
 
     public function createReservation(
