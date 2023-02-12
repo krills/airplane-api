@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Random flight booker</title>
+        <style>
+            table {
+                border-spacing: 0;
+                border-bottom: 1px solid #000;
+            }
+            table td {
+				border: 1px solid #000;
+                border-width: 1px 1px 0 0;
+                padding: 5px 3px;
+            }
+            table td:first-child {
+				border-left: 1px solid #000;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Random flight booker</h1>
+
+        <h2>Your current reservations</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Seat</th>
+                    <th>Cancel</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for reservation in reservations %}
+                <tr>
+                    <td>
+                        {{ reservation.flight.departure|date('Y-m-d') }}
+                    </td>
+                    <td>
+                        {{ reservation.flight.source.country }} /
+                        {{ reservation.flight.source.name }}
+                    </td>
+                    <td>
+                        {{ reservation.flight.destination.country }} /
+                        {{ reservation.flight.destination.name }}
+                    </td>
+                    <td>
+                        <form action="/api/reservation/{{ reservation.id }}/seat" method="post">
+                            <input value="{{ reservation.seat }}" name="seat" />
+                            <input type="submit" value="Change seat" />
+                        </form>
+                    </td>
+                    <td>
+                        <a href="/api/reservation/{{ reservation.id }}/cancel">Cancel</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5">No reservations found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Make reservation</h2>
+        <form method="post" action="/api/reservation">
+            <label>
+                <strong>Your passport number</strong>
+                <input type="text" name="passport" required />
+            </label>
+            <br/>
+            <label>
+                <strong>Departure date</strong>
+                <input type="date" name="departure" required value="{{ 'now'|date('Y-m-d') }}"/>
+            </label>
+            <br/>
+            <label>
+                <strong>From</strong>
+                <select name="from" required>
+                    <option selected value="{{ homePort.icao }}">{{ homePort.country }} / {{ homePort.name }}</option>
+                </select>
+            </label>
+            <label>
+                <strong>To</strong>
+                <select name="to" required>
+                    {% for randomDestination in randomDestinations %}
+                        {% if randomDestination.iata != homePort.iata %}
+                            <option value="{{ randomDestination.icao }}">
+                                {{ randomDestination.country }} / {{ randomDestination.name }}
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </label>
+            <br/>
+            <input type="submit" value="Make reservation" />
+        </form>
+    </body>
+</html>
